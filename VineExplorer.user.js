@@ -2167,6 +2167,7 @@ function initBackgroundScan() {
                         const now = new Date(); // Aktueller Zeitpunkt
 
                         if (lastScan === null || now - lastScan > oneHourInMilliseconds) {
+                              if (SETTINGS.DebugLevel > 10) console.log('lastScan:'+ lastScan.toISOString() +', reset _subStage to 0');
                             _subStage = 0;
                         }
                         else {
@@ -2182,6 +2183,7 @@ function initBackgroundScan() {
                             //rescan first 10 pages every 100 pages
                             let mod = _subStage%100;
                             if(mod >= 1 && mod <= 10){
+                                 if (SETTINGS.DebugLevel > 10) console.log('rescan page: ', mod);
                                 backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${mod}` , () => {_scanFinished()});
                             }
 
