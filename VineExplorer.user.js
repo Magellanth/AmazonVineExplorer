@@ -2178,6 +2178,14 @@ function initBackgroundScan() {
                             backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${_subStage + 1}` , () => {_scanFinished()});
                             _subStage++
                             localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT', _subStage);
+                            
+                            //rescan first 10 pages every 100 pages
+                            let mod = _subStage%100;
+                            if(mod >= 1 && mod <= 10){
+                                backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${mod}` , () => {_scanFinished()});
+                            }
+
+                            
                         } else {
                             _subStage = 0;
                             _backGroundScanStage++;
