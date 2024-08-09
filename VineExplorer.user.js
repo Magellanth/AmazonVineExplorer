@@ -2161,7 +2161,17 @@ function initBackgroundScan() {
                         break;
                     }
                     case 1: {   // queue=encore | queue=encore&pn=&cn=&page=2...x
-                        _subStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT'));
+                        lastScan = parseDate(localStorage.getItem('AVE_BACKGROUND_SCAN_LAST'));
+                        const oneHourInMilliseconds = 60 * 60 * 1000; // 1 Stunde = 60 Minuten * 60 Sekunden * 1000 Millisekunden
+                        const now = new Date(); // Aktueller Zeitpunkt
+
+                        if (now - lastScan > oneHourInMilliseconds) {
+                            _subStage = 0;
+                        }
+                        else {
+                            _subStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT'));
+                        }
+                        
                         if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.1 with _subStage: ', _subStage);
                         if (_subStage < (parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_MAX')) || 0)) {
                             backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${_subStage + 1}` , () => {_scanFinished()});
@@ -2172,6 +2182,7 @@ function initBackgroundScan() {
                             _backGroundScanStage++;
                             _scanFinished();
                         }
+                         localStorage.setItem('AVE_BACKGROUND_SCAN_LAST', now);
                         break;
                     }
                     case 2: {   // qerry about other values (tax, real prize, ....) ~ 20 - 30 Products then loopover to stage 1
