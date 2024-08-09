@@ -2161,7 +2161,7 @@ function initBackgroundScan() {
                         break;
                     }
                     case 1: {   // queue=encore | queue=encore&pn=&cn=&page=2...x
-                        lastScan = localStorage.getItem('AVE_BACKGROUND_SCAN_LAST');
+                        let lastScan = localStorage.getItem('AVE_BACKGROUND_SCAN_LAST');
                         lastScan = lastScan ? new Date(lastScan) : null;
                         const oneHourInMilliseconds = 60 * 60 * 1000; // 1 Stunde = 60 Minuten * 60 Sekunden * 1000 Millisekunden
                         const now = new Date(); // Aktueller Zeitpunkt
