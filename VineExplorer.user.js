@@ -2143,8 +2143,23 @@ function initBackgroundScan() {
                 _loopIsWorking = true;
 
                 let _backGroundScanStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_STAGE')) || 0;
+                
+                let lastScan = localStorage.getItem('AVE_BACKGROUND_SCAN_LAST');
+                lastScan = lastScan ? new Date(lastScan) : null;
+                const oneHourInMilliseconds = 60 * 60 * 1000; // 1 Stunde = 60 Minuten * 60 Sekunden * 1000 Millisekunden
+                const now = new Date(); 
+
+                if (lastScan === null || now - lastScan > oneHourInMilliseconds) {
+                      if (SETTINGS.DebugLevel > 10) console.log('lastScan:'+ lastScan.toISOString() +', reset _backGroundScanStage and _subStage to 0');
+                    _backGroundScanStage = 0;
+                    _subStage = 0;
+                }
+                
+                
                 if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan(): loop with _backgroundScanStage ', _backGroundScanStage, ' and Substage: ', _subStage);
 
+                
+                
                 switch (_backGroundScanStage) {
                     case 0:{    // potluck, last_chance
                         if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.0 with _subStage: ', _subStage);
@@ -2160,18 +2175,30 @@ function initBackgroundScan() {
                         }
                         break;
                     }
-                    case 1: {   // queue=encore | queue=encore&pn=&cn=&page=2...x
-                        let lastScan = localStorage.getItem('AVE_BACKGROUND_SCAN_LAST');
-                        lastScan = lastScan ? new Date(lastScan) : null;
-                        const oneHourInMilliseconds = 60 * 60 * 1000; // 1 Stunde = 60 Minuten * 60 Sekunden * 1000 Millisekunden
-                        const now = new Date(); // Aktueller Zeitpunkt
-
-                        if (lastScan === null || now - lastScan > oneHourInMilliseconds) {
-                              if (SETTINGS.DebugLevel > 10) console.log('lastScan:'+ lastScan.toISOString() +', reset _subStage to 0');
-                            _subStage = 0;
+                        case 1: {   // queue=encore | queue=encore&pn=&cn=&page=2...x
+  
+                       let subStagePrio = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_PRIO_CURRENT')) || 0;
+                        
+                        if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.1 with subStagePrio: ', subStagePrio);
+                        if (subStagePrio < 10) {
+                            backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${subStagePrio + 1}` , () => {_scanFinished()});
+                            subStagePrio++
+                            localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_PRIO_CURRENT', subStagePrio);
+                            
+                        } else {
+                            subStagePrio = 0;
+                            localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_PRIO_CURRENT', subStagePrio);
+                            _backGroundScanStage++;
+                            _scanFinished();
                         }
-                        else {
-                            _subStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT'));
+                         
+                        break;
+                    }
+                    case 2: {   // queue=encore | queue=encore&pn=&cn=&page=2...x
+                       
+                        _subStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT')) || 0;
+                        if(_subStage < 10){
+                            _subStage = 10;
                         }
                         
                         if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.1 with _subStage: ', _subStage);
@@ -2180,23 +2207,15 @@ function initBackgroundScan() {
                             _subStage++
                             localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT', _subStage);
                             
-                            //rescan first 10 pages every 100 pages
-                            let mod = _subStage%100;
-                            if(mod >= 1 && mod <= 10){
-                                 if (SETTINGS.DebugLevel > 10) console.log('rescan page: ', mod);
-                                backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${mod}` , () => {_scanFinished()});
-                            }
-
-                            
                         } else {
                             _subStage = 0;
                             _backGroundScanStage++;
                             _scanFinished();
                         }
-                         localStorage.setItem('AVE_BACKGROUND_SCAN_LAST',  now.toISOString());
+                         
                         break;
                     }
-                    case 2: {   // qerry about other values (tax, real prize, ....) ~ 20 - 30 Products then loopover to stage 1
+                    case 3: {   // qerry about other values (tax, real prize, ....) ~ 20 - 30 Products then loopover to stage 1
 
 
                         //Disaled due to Bugs fetching the Tax
@@ -2257,6 +2276,8 @@ function initBackgroundScan() {
                     if (SETTINGS.DebugLevel > 10) console.log(`initBackgroundScan()._scanFinished()`);
                     localStorage.setItem('AVE_BACKGROUND_SCAN_STAGE', _backGroundScanStage);
                     localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT', _subStage);
+                 
+                    localStorage.setItem('AVE_BACKGROUND_SCAN_LAST',  now.toISOString());
                     _loopIsWorking = false;
                     backGroundScanTimeout = setTimeout(initBackgroundScanSubFunctionScannerLoop, SETTINGS.BackGroundScanDelayPerPage + Math.round(Math.random() * SETTINGS.BackGroundScannerRandomness));
                 }
