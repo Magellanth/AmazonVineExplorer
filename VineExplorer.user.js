@@ -2210,8 +2210,10 @@ function initBackgroundScan() {
                             _subStage++
                             localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT', _subStage);
                             //after 100 pages return to the other stages, afterwards encore scan will resume at current page
-                            if(_subStage&100 === 0){
-                                _backGroundScanStage++;
+                            if(_subStage%100 === 0){
+                                  _backGroundScanStage++;
+                                if (SETTINGS.DebugLevel > 10) console.log('reached 100 pages, move to scanStage: ',   _backGroundScanStage);
+                              
                                  localStorage.setItem('AVE_BACKGROUND_SCAN_STAGE', _backGroundScanStage);
                             }
                             
