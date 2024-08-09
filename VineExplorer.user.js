@@ -2200,12 +2200,20 @@ function initBackgroundScan() {
                         if(_subStage < 10){
                             _subStage = 10;
                         }
+
                         
-                        if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.1 with _subStage: ', _subStage);
+                        
+                        
+                        if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.2 with _subStage: ', _subStage);
                         if (_subStage < (parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_MAX')) || 0)) {
                             backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${_subStage + 1}` , () => {_scanFinished()});
                             _subStage++
                             localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT', _subStage);
+                            //after 100 pages return to the other stages, afterwards encore scan will resume at current page
+                            if(_subStage&100 === 0){
+                                _backGroundScanStage++;
+                                 localStorage.setItem('AVE_BACKGROUND_SCAN_STAGE', _backGroundScanStage);
+                            }
                             
                         } else {
                             _subStage = 0;
@@ -2225,7 +2233,7 @@ function initBackgroundScan() {
 
 
 
-                        if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.2 with _subStage: ', _subStage);
+                        if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.3 with _subStage: ', _subStage);
                         database.getAll().then((products) => {
                             const _needUpdate = [];
                             const _randCount = Math.round(Math.random() * 4);
