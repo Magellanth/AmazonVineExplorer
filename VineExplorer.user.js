@@ -2151,7 +2151,9 @@ function initBackgroundScan() {
                 const now = new Date(); 
 
                 if (lastScan === null || now - lastScan > oneHourInMilliseconds) {
-                      if (SETTINGS.DebugLevel > 10) console.log('lastScan:'+ lastScan.toISOString() +', reset _backGroundScanStage and _subStage to 0');
+                    if(lastScan !== null){
+                        if (SETTINGS.DebugLevel > 10) console.log('lastScan:'+ lastScan.toISOString() +', reset _backGroundScanStage and _subStage to 0');
+                    }
                     _backGroundScanStage = 0;
                     _subStage = 0;
                 }
