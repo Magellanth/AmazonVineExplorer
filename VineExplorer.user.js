@@ -1840,8 +1840,8 @@ function addDBLoadingSymbol(){
      let subStagePrio = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_PRIO_CURRENT')) || 0;
     
     const _loadingDiv = document.createElement('div');
-    _loadingDiv.style.width = "25px";
-    _loadingDiv.style.height = "25px";
+    _loadingDiv.style.width = "200px";
+    _loadingDiv.style.height = "50px";
     // _loadingDiv.style.position = 'absolute';
     _loadingDiv.style.position = 'fixed';
     _loadingDiv.style.zIndex = '9999';
