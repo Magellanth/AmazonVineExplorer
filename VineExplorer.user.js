@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Amazon Vine Explorer
+// @name         AVE Mag
 // @namespace    http://tampermonkey.net/
 // @version      0.10.9.0.1
 // @updateURL    https://raw.githubusercontent.com/Amazon-Vine-Explorer/AmazonVineExplorer/main/VineExplorer.user.js
