@@ -2153,15 +2153,14 @@ function initBackgroundScan() {
                 
                 let lastScan = localStorage.getItem('AVE_BACKGROUND_SCAN_LAST');
                 lastScan = lastScan ? new Date(lastScan) : null;
-                const oneHourInMilliseconds = 60 * 60 * 1000; // 1 Stunde = 60 Minuten * 60 Sekunden * 1000 Millisekunden
+                const rescanAfter = 60 * 60 * 1000; // 1 Stunde = 60 Minuten * 60 Sekunden * 1000 Millisekunden
                 const now = new Date(); 
 
-                if (lastScan === null || now - lastScan > oneHourInMilliseconds) {
+                if (lastScan === null || now - lastScan > rescanAfter) {
                     if(lastScan !== null){
                         if (SETTINGS.DebugLevel > 10) console.log('lastScan:'+ lastScan.toISOString() +', reset _backGroundScanStage and _subStage to 0');
                     }
                     _backGroundScanStage = 0;
-                    _subStage = 0;
                 }
                 
                 
@@ -2218,8 +2217,8 @@ function initBackgroundScan() {
                             backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${_subStage + 1}` , () => {_scanFinished()});
                             _subStage++
                             localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT', _subStage);
-                            //after 100 pages return to the other stages, afterwards encore scan will resume at current page
-                            if(_subStage%100 === 0){
+                            //after 200 pages return to the other stages, afterwards encore scan will resume at current page
+                            if(_subStage%200 === 0){
                                   _backGroundScanStage++;
                                 if (SETTINGS.DebugLevel > 10) console.log('reached 100 pages, move to scanStage: ',   _backGroundScanStage);
                               
