@@ -2185,17 +2185,15 @@ function initBackgroundScan() {
                     }
                         case 1: {   // queue=encore | queue=encore&pn=&cn=&page=2...x
   
-                       let subStagePrio = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_PRIO_CURRENT')) || 0;
+                       _subStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT')) || 0;
                         
-                        if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.1 with subStagePrio: ', subStagePrio);
-                        if (subStagePrio < 10) {
-                            backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${subStagePrio + 1}` , () => {_scanFinished()});
-                            subStagePrio++
-                            localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_PRIO_CURRENT', subStagePrio);
+                        if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.1 with _subStage: ', _subStage);
+                        if (_subStage < 10) {
+                            backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${_subStage + 1}` , () => {_scanFinished()});
+                            _subStage++
                             
                         } else {
-                            subStagePrio = 0;
-                            localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_PRIO_CURRENT', subStagePrio);
+                            _subStage = 0;
                             _backGroundScanStage++;
                             _scanFinished();
                         }
@@ -2204,21 +2202,19 @@ function initBackgroundScan() {
                     }
                     case 2: {   // queue=encore | queue=encore&pn=&cn=&page=2...x
                        
-                        _subStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT')) || 0;
-                        if(_subStage < 10){
-                            _subStage = 10;
+                        let subStageEncore = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_ENCORE_CURRENT')) || 0;
+                        if(subStageEncore < 10){
+                            subStageEncore = 10;
                         }
 
                         
-                        
-                        
-                        if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.2 with _subStage: ', _subStage);
-                        if (_subStage < (parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_MAX')) || 0)) {
-                            backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${_subStage + 1}` , () => {_scanFinished()});
-                            _subStage++
-                            localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT', _subStage);
+                        if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.2 with subStageEncore: ', subStageEncore);
+                        if (subStageEncore < (parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_MAX')) || 0)) {
+                            backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${subStageEncore + 1}` , () => {_scanFinished()});
+                            subStageEncore++
+                            localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_ENCORE_CURRENT', subStageEncore);
                             //after 200 pages return to the other stages, afterwards encore scan will resume at current page
-                            if(_subStage%200 === 0){
+                            if(subStageEncore%200 === 0){
                                   _backGroundScanStage++;
                                 if (SETTINGS.DebugLevel > 10) console.log('reached 100 pages, move to scanStage: ',   _backGroundScanStage);
                               
@@ -2226,7 +2222,8 @@ function initBackgroundScan() {
                             }
                             
                         } else {
-                            _subStage = 0;
+                            subStageEncore = 0;
+                            localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_ENCORE_CURRENT', subStageEncore);
                             _backGroundScanStage++;
                             _scanFinished();
                         }
