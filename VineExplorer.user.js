@@ -2155,13 +2155,16 @@ function initBackgroundScan() {
                 lastScan = lastScan ? new Date(lastScan) : null;
                 const rescanAfter = 60 * 60 * 1000; // 1 Stunde = 60 Minuten * 60 Sekunden * 1000 Millisekunden
                 const now = new Date(); 
-
+                let rescanPages = 100;
+                let rescanAfterPages = 200;
+                
                 if (lastScan === null || now - lastScan > rescanAfter) {
                     if(lastScan !== null){
                         if (SETTINGS.DebugLevel > 10) console.log('lastScan:'+ lastScan.toISOString() +', reset _backGroundScanStage and _subStage to 0');
                     }
                     _backGroundScanStage = 0;
                 }
+                
                 
                 
                 if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan(): loop with _backgroundScanStage ', _backGroundScanStage, ' and Substage: ', _subStage);
@@ -2188,7 +2191,7 @@ function initBackgroundScan() {
                        _subStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT')) || 0;
                         
                         if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.1 with _subStage: ', _subStage);
-                        if (_subStage < 10) {
+                        if (_subStage < rescanPages) {
                             backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${_subStage + 1}` , () => {_scanFinished()});
                             _subStage++
                             
@@ -2203,8 +2206,8 @@ function initBackgroundScan() {
                     case 2: {   // queue=encore | queue=encore&pn=&cn=&page=2...x
                        
                         let subStageEncore = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_ENCORE_CURRENT')) || 0;
-                        if(subStageEncore < 10){
-                            subStageEncore = 10;
+                        if(subStageEncore < rescanPages){
+                            subStageEncore = rescanPages;
                         }
 
                         
@@ -2214,7 +2217,7 @@ function initBackgroundScan() {
                             subStageEncore++
                             localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_ENCORE_CURRENT', subStageEncore);
                             //after 200 pages return to the other stages, afterwards encore scan will resume at current page
-                            if(subStageEncore%200 === 0){
+                            if((subStageEncore-rescanPages)%rescanAfterPages === 0){
                                   _backGroundScanStage++;
                                 if (SETTINGS.DebugLevel > 10) console.log('reached 100 pages, move to scanStage: ',   _backGroundScanStage);
                               
